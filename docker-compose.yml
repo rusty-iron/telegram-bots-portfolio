@@ -1,0 +1,130 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        - TZ=${TZ}
+    image: meatbot-app:dev
+    container_name: meatbot-app
+    env_file:
+      - ./.env
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ./meatbot:/app/meatbot
+      - ./static:/app/static
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["python", "-m", "meatbot.app.main"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:${WEB_APP_PORT:-8000}/health/ready >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - meatnet
+    ports:
+      - "${WEB_APP_PORT:-8000}:${WEB_APP_PORT:-8000}"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.nginx
+    image: meatbot-nginx:dev
+    container_name: meatbot-nginx
+    volumes:
+      - ./static:/app/static:ro
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/health/live || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - meatnet
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        - TZ=${TZ}
+    image: meatbot-worker:dev
+    container_name: meatbot-worker
+    env_file:
+      - ./.env
+    environment:
+      - TZ=${TZ}
+      # Celery security: enforce JSON serialization (FINDING-4.1 mitigation)
+      - CELERY_TASK_SERIALIZER=json
+      - CELERY_RESULT_SERIALIZER=json
+      - CELERY_ACCEPT_CONTENT=json
+    volumes:
+      - ./meatbot:/app/meatbot
+      - ./static:/app/static
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["celery", "-A", "meatbot.app.celery_app", "worker", "--loglevel=info", "--concurrency=2"]
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A meatbot.app.celery_app inspect ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - meatnet
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: meatbot-db
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_DB=meatbot
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - TZ=${TZ}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d meatbot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - meatnet
+
+  redis:
+    image: redis:7
+    container_name: meatbot-redis
+    env_file:
+      - ./.env
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - meatnet
+
+volumes:
+  pgdata:
+  product_images:
+
+networks:
+  meatnet:
+    driver: bridge

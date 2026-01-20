@@ -1,0 +1,23 @@
+FROM nginx:1.24-alpine
+
+# Копируем конфигурацию
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+# Создаем директории для логов
+RUN mkdir -p /var/log/nginx
+
+# Создаем директорию для статики
+RUN mkdir -p /app/static
+
+# Устанавливаем права
+RUN chown -R nginx:nginx /var/log/nginx /app/static
+
+# Открываем порт
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/health/live || exit 1
+
+# Запуск Nginx
+CMD ["nginx", "-g", "daemon off;"]
