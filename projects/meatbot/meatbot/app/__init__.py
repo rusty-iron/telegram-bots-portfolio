@@ -1,0 +1,1 @@
+"""MeatBot application package."""

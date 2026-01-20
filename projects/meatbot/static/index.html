@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeatBot - Статические файлы</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #d32f2f;
+            text-align: center;
+        }
+        .status {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .test-image {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .test-image img {
+            max-width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥩 MeatBot</h1>
+        
+        <div class="status">
+            <h3>✅ Статические файлы работают!</h3>
+            <p>Nginx успешно раздает статические файлы из директории <code>/app/static</code></p>
+        </div>
+        
+        <div class="info">
+            <h3>📋 Информация о сервере</h3>
+            <ul>
+                <li><strong>Сервер:</strong> Nginx 1.25</li>
+                <li><strong>Статика:</strong> /app/static/</li>
+                <li><strong>Кэширование:</strong> 30 дней</li>
+                <li><strong>Gzip:</strong> Включен</li>
+                <li><strong>WebP:</strong> Поддерживается</li>
+            </ul>
+        </div>
+        
+        <div class="test-image">
+            <h3>🖼️ Тестовое изображение</h3>
+            <img src="/static/images/test.jpg" alt="Тестовое изображение" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <p style="display:none; color: #666;">Тестовое изображение не найдено. Добавьте файл test.jpg в /static/images/</p>
+        </div>
+        
+        <div class="info">
+            <h3>🔗 Полезные ссылки</h3>
+            <ul>
+                <li><a href="/health/live">Health Check - Live</a></li>
+                <li><a href="/health/ready">Health Check - Ready</a></li>
+                <li><a href="/static/">Директория статики</a></li>
+            </ul>
+        </div>
+        
+        <div class="status">
+            <h3>🚀 MeatBot готов к работе!</h3>
+            <p>Система успешно настроена и готова к обработке заказов мясных изделий через Telegram.</p>
+        </div>
+    </div>
+</body>
+</html>
