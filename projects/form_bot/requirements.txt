@@ -1,0 +1,16 @@
+# FormBot Dependencies
+# Python 3.10+
+
+# Telegram Bot Framework
+aiogram==3.13.1
+
+# Configuration Management
+pydantic==2.9.2
+pydantic-settings==2.6.1
+
+# Async HTTP (dependency of aiogram)
+aiohttp==3.10.10
+
+# Type checking (development)
+# mypy==1.13.0
+# types-aiogram==2.25.1

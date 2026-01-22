@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  formbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: formbot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # Персистентное хранение данных заявок
+      - ./data:/app/data
+      # Персистентное хранение логов
+      - ./logs:/app/logs
+    environment:
+      - TZ=Europe/Moscow
+    # Ограничение ресурсов
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+    # Проверка здоровья (опционально)
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
