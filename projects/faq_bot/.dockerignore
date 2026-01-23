@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Documentation
+*.md
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.docker/
+
+# Data (will be mounted)
+data/
+
+# Tests
+tests/
+*_test.py
+test_*.py
+
+# OS
+.DS_Store
+Thumbs.db
